@@ -1,0 +1,74 @@
+###join all data from previous 12 monthes from 2022/05 to 2023/04
+select *
+from `202204_Trip_Data.202205-data`
+union all 
+select * 
+from `202204_Trip_Data.202206-data`
+union all
+select *
+from `202204_Trip_Data.202207-data`
+union all
+select *
+from `202204_Trip_Data.202208-data`
+union all
+select *
+from `202204_Trip_Data.202209-data`
+union all
+select *
+from `202204_Trip_Data.202210-data`
+union all
+select *
+from `202204_Trip_Data.202211-data`
+union all
+select *
+from `202204_Trip_Data.202212-data`
+union all
+select *
+from `202204_Trip_Data.202301-data`
+union all
+select *
+from `202204_Trip_Data.202302-data`
+union all
+select *
+from `202204_Trip_Data.202303-data`
+union all
+select *
+from `202204_Trip_Data.202304-data`
+
+###summary statistics of the whole dataset by membership
+select member_casual,
+    count(ride_id) as total_rides,
+    round(avg(ride_length), 2) as avg_length, 
+    sum(ride_length) as sum_length, 
+    max(ride_length) as max_length,
+    (select  ride_length
+      from `202204_Trip_Data.tripdata`
+      group by ride_length
+      order by count(*) desc
+      limit 1) as mode_length
+from `202204_Trip_Data.tripdata`
+group by member_casual
+
+###total rides and average ride length by bike type and membership
+select member_casual, rideable_type as bike_type, count(ride_id) as total_rides, round(avg(ride_length), 2) as average_length
+from `202204_Trip_Data.tripdata`
+group by bike_type, member_casual
+order by total_rides desc, member_casual asc
+
+###total rides by day of week and membership
+select member_casual, day_of_week, is_weekend, count(ride_id) as total_rides
+from `202204_Trip_Data.tripdata`
+group by day_of_week, member_casual, is_weekend
+order by total_rides desc
+
+###total rides and average ride length by hour in a day and membership
+select DISTINCT EXTRACT(HOUR FROM started_at) as hour, is_PM, member_casual, count(ride_id) as total_rides, round(avg(ride_length), 2) as average_length
+from `202204_Trip_Data.tripdata`
+group by hour, member_casual, is_PM
+order by hour asc, member_casual asc
+
+###total rides and average ride length by month and membership
+select DISTINCT EXTRACT(MONTH FROM started_at) as month, member_casual, count(ride_id) as total_rides, round(avg(ride_length), 2) as average_length
+from `202204_Trip_Data.tripdata`
+group by month, member_casual
+order by month asc, member_casual asc
